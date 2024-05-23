@@ -147,3 +147,33 @@ On average it took 11.6 rounds to end the game with adversarial play compared to
   <img width="700" alt="image" src="https://github.com/quinntpratt/classroom_uno_game/assets/32646393/b70ecf4f-f489-478d-9a55-50d1ee6c8583">
 </p>
 
+## Exploring trends.
+This example shows how we can estimate the number of rounds it would take for students to "win" the game as a function of their initial points.
+The following code can be used to determine this,
+```py
+init_points = [50, 100, 150, 200, 250]
+avg_rounds = []
+std_rounds = []
+N_games = 500
+N_players = 4
+names = [f"Player {i}" for i in range(N_players)]
+for p in init_points:
+    rounds = np.zeros((N_games,N_players))
+    cards_drawn = np.zeros((N_games,N_players))
+    for i in range(N_games):
+        players = group_play(*names, uno_kwargs=dict(init_points=p))
+        rounds[i,:] = np.array([p.round for p in players])
+    avg_rounds += [np.average(rounds.flatten())]
+    std_rounds += [np.std(rounds.flatten())]
+
+plt.figure("Rounds vs. init. points")
+plt.errorbar(init_points, avg_rounds, yerr=std_rounds,
+             fmt="--o",ecolor="k",color="b",ms=10,capsize=4)
+plt.xlabel("Starting points")
+plt.ylabel("Rounds")
+```
+The result of is a very linear trendline with the overall relationship: ``(average number of rounds) = 0.22*(initial points)``.
+<p align="center">
+	<img width="500" alt="image" src="https://github.com/quinntpratt/classroom_uno_game/assets/32646393/47a40c00-da90-4d4b-b135-f6229d42ad2c">
+</p>
+
